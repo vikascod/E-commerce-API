@@ -40,8 +40,7 @@ async def update_cart_item(cart_id: int, item_id: int, item: schemas.CartCreate,
     cart_item = db.query(models.Cart).filter(models.Cart.id == item_id).first()
     if not cart_item:
         raise HTTPException(status_code=404, detail="Cart item not found")
-    # if item.quantity > cart_item.product.quantity:
-    #     raise HTTPException(status_code=400, detail="Not enough product in stock")
+
     cart_item.quantity = item.quantity
     db.add(cart_item)
     db.commit()
