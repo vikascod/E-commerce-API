@@ -13,13 +13,13 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[schemas.Order])
-def read_orders(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+async def read_orders(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     orders = db.query(models.Order).offset(skip).limit(limit).all()
     return orders
 
 
 @router.get("/{order_id}", response_model=schemas.Order)
-def read_order(order_id: int, db: Session = Depends(get_db)):
+async def read_order(order_id: int, db: Session = Depends(get_db)):
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
     if not order:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
@@ -27,7 +27,7 @@ def read_order(order_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=schemas.Order)
-def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
+async def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
 
     user = db.query(models.User).filter(models.User.id == order.user_id).first()
     if not user:
@@ -47,7 +47,7 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/{order_id}", response_model=schemas.Order)
-def update_order(order_id: int, order: schemas.OrderCreate, db: Session = Depends(get_db)):
+async def update_order(order_id: int, order: schemas.OrderCreate, db: Session = Depends(get_db)):
     existing_order = db.query(models.Order).filter(models.Order.id == order_id)
     if not existing_order.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
@@ -64,7 +64,7 @@ def update_order(order_id: int, order: schemas.OrderCreate, db: Session = Depend
 
 
 @router.delete("/{order_id}")
-def delete_order(order_id: int, db: Session = Depends(get_db)):
+async def delete_order(order_id: int, db: Session = Depends(get_db)):
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
     if not order:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")

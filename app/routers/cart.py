@@ -12,14 +12,14 @@ router = APIRouter(
 
 
 @router.get("/carts/{cart_id}/items", response_model=schemas.Cart)
-def get_cart_items(cart_id: int, db: Session = Depends(get_db)):
+async def get_cart_items(cart_id: int, db: Session = Depends(get_db)):
     cart = db.query(models.Cart).filter(models.Cart.id == cart_id).first()
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
     return cart
 
 @router.post("/carts", response_model=schemas.Cart)
-def add_item_to_cart(item: schemas.CartCreate, db: Session = Depends(get_db)):
+async def add_item_to_cart(item: schemas.CartCreate, db: Session = Depends(get_db)):
     product = db.query(models.Product).filter(models.Product.id == item.product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -33,7 +33,7 @@ def add_item_to_cart(item: schemas.CartCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/carts/{cart_id}/items/{item_id}", response_model=schemas.Cart)
-def update_cart_item(cart_id: int, item_id: int, item: schemas.CartCreate, db: Session = Depends(get_db)):
+async def update_cart_item(cart_id: int, item_id: int, item: schemas.CartCreate, db: Session = Depends(get_db)):
     cart = db.query(models.Cart).filter(models.Cart.id == cart_id).first()
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
@@ -50,7 +50,7 @@ def update_cart_item(cart_id: int, item_id: int, item: schemas.CartCreate, db: S
 
 
 @router.delete("/carts/{cart_id}/items/{item_id}")
-def delete_cart_item(cart_id: int, item_id: int, db: Session = Depends(get_db)):
+async def delete_cart_item(cart_id: int, item_id: int, db: Session = Depends(get_db)):
     
     cart = db.query(models.Cart).filter(models.Cart.id == cart_id).first()
     if not cart:
