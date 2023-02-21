@@ -24,12 +24,24 @@ async def all_read(skip: int = 0, limit: int = 20, search:Optional[str]="", db:S
     return products
 
 
+
 @router.get('/{id}', response_model=schemas.Product)
 async def show(id:int, db:Session=Depends(get_db)):
     product = db.query(models.Product).filter(models.Product.id==id).first()
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No product available with id {id}")
     return product
+
+
+
+@router.get('/', response_model=schemas.Product)
+async def read_items(search:Optional[str]='', limit: int = 20, db:Session=Depends(get_db)):
+    products = db.query(models.Product).filter(models.Product.name.contains(search)).limit(limit).all()
+    if not products:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No product available {search}")
+    return products
+
+
 
 @router.delete('/{id}')
 async def destroy(id:int, db:Session=Depends(get_db)):

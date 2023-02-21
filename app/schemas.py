@@ -56,6 +56,8 @@ class Order(OrderBase):
     created_at: Optional[datetime]
     user: Optional[User]
     product: Optional[Product]
+    is_confirmed = bool
+    status: Optional[str] = 'Pending'
     class Config:
         orm_mode=True
 

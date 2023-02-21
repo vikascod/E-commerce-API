@@ -42,6 +42,7 @@ class Order(Base):
     quantity = Column(Integer, nullable=False)
     total_price = Column(Integer, nullable=False)
     is_confirmed = Column(Boolean, default=False)
+    status = Column(String, default='Pending')
     created_at = Column(DateTime, default=func.now())
 
     user = relationship("User", back_populates="orders")
