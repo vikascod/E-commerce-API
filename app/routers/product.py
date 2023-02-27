@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import schemas, models
 from typing import Optional, List
+from app.oauth2 import get_current_user
 
 router = APIRouter(
     prefix='/product',
@@ -10,8 +11,8 @@ router = APIRouter(
 )
 
 @router.post('/')
-async def create(product:schemas.ProductCreate, db:Session=Depends(get_db)):
-    new_product = models.Product(**product.dict())
+async def create(product:schemas.ProductCreate, db:Session=Depends(get_db), current_user:int=Depends(get_current_user)):
+    new_product = models.Product(user_id=current_user.id, **product.dict())
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
@@ -44,21 +45,30 @@ async def read_items(search:Optional[str]='', limit: int = 20, db:Session=Depend
 
 
 @router.delete('/{id}')
-async def destroy(id:int, db:Session=Depends(get_db)):
+async def destroy(id:int, db:Session=Depends(get_db), current_user:int=Depends(get_current_user)):
     product = db.query(models.Product).filter(models.Product.id==id).first()
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No product available with id {id}")
+
+    if product.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform actions")
+
     db.delete(product)
     db.commit()
     return {'msg':'Deleted'}
 
 
 @router.put('/{id}')
-async def update(id:int, request:schemas.ProductCreate, db:Session=Depends(get_db)):
+async def update(id:int, request:schemas.ProductCreate, db:Session=Depends(get_db), current_user:int=Depends(get_current_user)):
     product_upd = db.query(models.Product).filter(models.Product.id==id)
     product = product_upd.first()
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No product available with id {id}")
+
+    if product.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform actions")
+
+    user_id = current_user.id
     update_data = request.dict(exclude_unset=True)
     db.query(models.Product).filter(models.Product.id==id).update(update_data)
     db.commit()

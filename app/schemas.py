@@ -39,8 +39,21 @@ class Product(ProductBase):
         orm_mode=True
 
 
+class CommentCreate(BaseModel):
+    massage : str
+
+class CommentOut(BaseModel):
+    id:int
+    massage : str
+    created_at : datetime
+    product : Product
+    user = User
+    class Config:
+        orm_mode=True
+
+
+
 class OrderBase(BaseModel):
-    user_id: int
     product_id: int
     quantity: int
 
@@ -56,6 +69,7 @@ class Order(OrderBase):
     created_at: Optional[datetime]
     user: Optional[User]
     product: Optional[Product]
+    comment : Optional[CommentOut]
     is_confirmed = bool
     status: Optional[str] = 'Pending'
     class Config:
@@ -63,7 +77,6 @@ class Order(OrderBase):
 
 
 class CartBase(BaseModel):
-    user_id: int
     product_id: int
     quantity: int
 
@@ -79,3 +92,12 @@ class Cart(CartBase):
     quantity: int
     class Config:
         orm_mode=True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: str | None = None

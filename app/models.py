@@ -28,9 +28,11 @@ class Product(Base):
     description = Column(Text, nullable=True)
     is_sale = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
     cart_items = relationship("Cart", back_populates="product")
     orders = relationship("Order", back_populates="product")
+    comment = relationship('Comment')
 
     
 class Order(Base):
@@ -43,7 +45,7 @@ class Order(Base):
     total_price = Column(Integer, nullable=False)
     is_confirmed = Column(Boolean, default=False)
     status = Column(String, default='Pending')
-    created_at = Column(DateTime, default=func.now())
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="orders")
     product = relationship("Product", back_populates="orders")
@@ -61,3 +63,15 @@ class Cart(Base):
     user = relationship("User", backref="cart")
     product = relationship("Product", back_populates="cart_items")
 
+
+class Comment(Base):
+    __tablename__ = 'comments'
+
+    id = Column(Integer, primary_key=True)
+    massage = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
+    product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'))
+
+    user = relationship('User')
+    product = relationship('Product')
