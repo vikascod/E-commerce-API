@@ -5,10 +5,38 @@ from app import schemas, models
 from typing import Optional, List
 from app.oauth2 import get_current_user
 
+
+import redis
+import requests
+import json
+
+
+# host = "localhost"
+# # host = "192.168.1.100" 
+# port = 6379
+# rd = redis.Redis(host=host, port=port)
+# print(f"Connecting to Redis at {host}:{port}...")
+
+
+
 router = APIRouter(
     prefix='/product',
     tags=['Products']
 )
+
+
+class ProductEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, models.Product):
+            return {
+                "id": obj.id,
+                "name": obj.name,
+                "description": obj.description,
+                "price": obj.price,
+                "is_offer": obj.is_sale,
+            }
+        return super().default(obj)
+
 
 @router.post('/')
 async def create(product:schemas.ProductCreate, db:Session=Depends(get_db), current_user:int=Depends(get_current_user)):
@@ -19,9 +47,25 @@ async def create(product:schemas.ProductCreate, db:Session=Depends(get_db), curr
     return new_product
 
 
+# @router.get('/', response_model=List[schemas.Product])
+# async def all_read(skip: int = 0, limit: int = 20, search:Optional[str]="", db:Session=Depends(get_db)):
+#     products = db.query(models.Product).filter(models.Product.name.contains(search)).offset(skip).limit(limit).all()
+#     cache = rd.get(json.dumps(products, cls=ProductEncoder))
+#     if cache:
+#         return json.loads(cache)
+#     else:
+#         r = requests.get("http://localhost:8000")
+#         rd.set(json.dumps(products, cls=ProductEncoder), r.text)
+#         return r.json()
+
+
+
+
 @router.get('/', response_model=List[schemas.Product])
 async def all_read(skip: int = 0, limit: int = 20, search:Optional[str]="", db:Session=Depends(get_db)):
+
     products = db.query(models.Product).filter(models.Product.name.contains(search)).offset(skip).limit(limit).all()
+
     return products
 
 

@@ -16,3 +16,8 @@ app.include_router(product.router)
 app.include_router(cart.router)
 app.include_router(order.router)
 app.include_router(comment.router)
+
+
+@app.get('/')
+def home():
+    return "Hello World"
