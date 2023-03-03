@@ -68,10 +68,15 @@ class Comment(Base):
     __tablename__ = 'comments'
 
     id = Column(Integer, primary_key=True)
-    massage = Column(Text, nullable=False)
+    message = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
-    product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'))
+    related_product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'))
 
     user = relationship('User')
-    product = relationship('Product')
+    product = relationship('Product', foreign_keys=[related_product_id])
+
+
+
+
+    

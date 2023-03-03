@@ -11,11 +11,11 @@ import requests
 import json
 
 
-# host = "localhost"
-# # host = "192.168.1.100" 
-# port = 6379
-# rd = redis.Redis(host=host, port=port)
-# print(f"Connecting to Redis at {host}:{port}...")
+host = "localhost"
+# host = "192.168.1.100" 
+port = 6379
+rd = redis.Redis(host=host, port=port)
+print(f"Connecting to Redis at {host}:{port}...")
 
 
 
@@ -48,14 +48,17 @@ async def create(product:schemas.ProductCreate, db:Session=Depends(get_db), curr
 
 
 # @router.get('/', response_model=List[schemas.Product])
-# async def all_read(skip: int = 0, limit: int = 20, search:Optional[str]="", db:Session=Depends(get_db)):
+# async def all_read(skip: int = 0, limit: int = 20, search: Optional[str] = "", db: Session = Depends(get_db)):
 #     products = db.query(models.Product).filter(models.Product.name.contains(search)).offset(skip).limit(limit).all()
-#     cache = rd.get(json.dumps(products, cls=ProductEncoder))
+#     cache_key = json.dumps(products, cls=ProductEncoder)
+#     cache = rd.get(cache_key)
 #     if cache:
+#         print("Products from cache")
 #         return json.loads(cache)
 #     else:
 #         r = requests.get("http://localhost:8000")
-#         rd.set(json.dumps(products, cls=ProductEncoder), r.text)
+#         print("Product cache set")
+#         rd.set(cache_key, json.dumps(products, cls=ProductEncoder))
 #         return r.json()
 
 

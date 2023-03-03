@@ -15,8 +15,10 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
+    id: int
     is_active: bool
     created_at: Optional[datetime]
+
     class Config:
         orm_mode=True
 
@@ -33,8 +35,10 @@ class ProductCreate(ProductBase):
 
 
 class Product(ProductBase):
-    id:int
+    id: int
     created_at: Optional[datetime]
+    user_id: int
+
     class Config:
         orm_mode=True
 
@@ -42,15 +46,16 @@ class Product(ProductBase):
 class CommentCreate(BaseModel):
     massage : str
 
+
 class CommentOut(BaseModel):
-    id:int
+    id: int
     massage : str
     created_at : datetime
-    product : Product
-    user = User
+    product_id: int
+    user_id: int
+
     class Config:
         orm_mode=True
-
 
 
 class OrderBase(BaseModel):
@@ -67,11 +72,12 @@ class Order(OrderBase):
     total_price: int
     is_confirmed: Optional[bool]
     created_at: Optional[datetime]
-    user: Optional[User]
-    product: Optional[Product]
-    comment : Optional[CommentOut]
+    user_id: int
+    product_id: int
+    comment : Optional[CommentOut] = None
     is_confirmed = bool
     status: Optional[str] = 'Pending'
+
     class Config:
         orm_mode=True
 
@@ -87,9 +93,10 @@ class CartCreate(CartBase):
 
 class Cart(CartBase):
     id: int
-    user: Optional[User]
-    product: Optional[Product]
+    user_id: int
+    product_id: int
     quantity: int
+
     class Config:
         orm_mode=True
 
